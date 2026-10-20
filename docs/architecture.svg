@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" font-family="Helvetica, Arial, sans-serif">
+  <rect width="1100" height="560" fill="#fbfbfd"/>
+  <style>
+    .box   { fill:#ffffff; stroke:#3b4a5a; stroke-width:2; rx:6; }
+    .hw    { fill:#e8f1fb; stroke:#2f6fb5; stroke-width:2; rx:6; }
+    .sw    { fill:#eaf7ee; stroke:#2e8b57; stroke-width:2; rx:6; }
+    .dat   { fill:#fdf3e2; stroke:#c8892a; stroke-width:2; rx:6; }
+    .lbl   { font-size:15px; font-weight:bold; fill:#1b2733; }
+    .sub   { font-size:12px; fill:#41505f; }
+    .mono  { font-size:12px; fill:#41505f; font-family:"DejaVu Sans Mono", monospace; }
+    .edge  { stroke:#4a5b6d; stroke-width:2; fill:none; marker-end:url(#a); }
+    .dash  { stroke:#2e8b57; stroke-width:2; fill:none; stroke-dasharray:6 4; marker-end:url(#g); }
+    .t     { font-size:11.5px; fill:#2e8b57; }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4a5b6d"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e8b57"/>
+    </marker>
+  </defs>
+
+  <text x="30" y="34" font-size="21" font-weight="bold" fill="#16212c">Volcano Monitoring System - architecture</text>
+
+  <!-- sensors -->
+  <rect class="dat" x="30" y="60" width="150" height="200" rx="8"/>
+  <text class="lbl" x="45" y="84">Sensors</text>
+  <text class="mono" x="45" y="112">VIB  8-bit</text>
+  <text class="mono" x="45" y="136">TMP  8-bit</text>
+  <text class="mono" x="45" y="160">GAS  8-bit</text>
+  <text class="mono" x="45" y="184">ACT  8-bit</text>
+  <text class="sub" x="45" y="214">ADC values 0-255</text>
+  <text class="sub" x="45" y="232">sampled every tick</text>
+
+  <!-- channel x4 -->
+  <rect class="hw" x="240" y="60" width="250" height="200" rx="8"/>
+  <text class="lbl" x="255" y="84">Sensor channel  (x4)</text>
+  <text class="sub" x="255" y="108">Comparator  value &gt;= WATCH</text>
+  <text class="sub" x="255" y="130">Comparator  value &gt;= DANGER</text>
+  <text class="sub" x="255" y="152">NOT gate turns "&lt;" into "&gt;="</text>
+  <text class="sub" x="255" y="178">green / yellow / red LED</text>
+  <text class="sub" x="255" y="200">per-sensor watch + danger flags</text>
+  <text class="mono" x="255" y="232">VIB TMP GAS ACT</text>
+
+  <!-- global logic -->
+  <rect class="hw" x="550" y="60" width="250" height="200" rx="8"/>
+  <text class="lbl" x="565" y="84">Global decision logic</text>
+  <text class="sub" x="565" y="108">OR tree   WANY  any sensor on WATCH</text>
+  <text class="sub" x="565" y="130">OR tree   DANY  any sensor on DANGER</text>
+  <text class="sub" x="565" y="152">Adder chain  DCNT  danger count 0-4</text>
+  <text class="sub" x="565" y="178">Comparator  DCNT &gt;= 2  -&gt; EMERG</text>
+  <text class="sub" x="565" y="200">system LEDs + alarm LED + buzzer</text>
+  <text class="mono" x="565" y="232">outputs: WATCH DANGER EMERG DCNT</text>
+
+  <!-- counters -->
+  <rect class="hw" x="860" y="60" width="210" height="200" rx="8"/>
+  <text class="lbl" x="875" y="84">Time window</text>
+  <text class="sub" x="875" y="108">Clock drives a window counter</text>
+  <text class="sub" x="875" y="130">counter 0..8, carry = window end</text>
+  <text class="sub" x="875" y="152">abnormal counter increments</text>
+  <text class="sub" x="875" y="170">while any sensor is abnormal</text>
+  <text class="sub" x="875" y="192">and is cleared each window</text>
+  <text class="mono" x="875" y="232">hex display: ABN</text>
+
+  <!-- data file -->
+  <rect class="dat" x="30" y="320" width="190" height="110" rx="8"/>
+  <text class="lbl" x="45" y="344">Recorded data</text>
+  <text class="mono" x="45" y="368">sensor_readings.csv</text>
+  <text class="sub" x="45" y="392">26 samples of the</text>
+  <text class="sub" x="45" y="410">eruption sequence</text>
+
+  <!-- asm -->
+  <rect class="sw" x="280" y="320" width="330" height="110" rx="8"/>
+  <text class="lbl" x="295" y="344">x86-64 assembly program</text>
+  <text class="sub" x="295" y="368">parse the CSV, per sensor compute</text>
+  <text class="sub" x="295" y="388">min / max / average and the WATCH and</text>
+  <text class="sub" x="295" y="408">DANGER sample counts</text>
+  <text class="mono" x="295" y="424">no libc - direct Linux syscalls</text>
+
+  <!-- report -->
+  <rect class="sw" x="670" y="320" width="250" height="110" rx="8"/>
+  <text class="lbl" x="685" y="344">Final warning report</text>
+  <text class="sub" x="685" y="368">overall severity</text>
+  <text class="sub" x="685" y="388">emergency alarm yes / no</text>
+  <text class="sub" x="685" y="408">recommended action</text>
+  <text class="mono" x="685" y="424">stdout + out/volcano_report.txt</text>
+
+  <!-- thresholds -->
+  <rect class="box" x="30" y="470" width="520" height="66" rx="8" stroke-dasharray="7 4"/>
+  <text class="lbl" x="45" y="494">Shared thresholds  (asm/thresholds.inc)</text>
+  <text class="mono" x="45" y="518">VIB 40/70    TMP 60/85    GAS 100/180    ACT 50/80    alarm at 2 sensors in DANGER</text>
+
+  <!-- edges -->
+  <path class="edge" d="M180,140 L240,140"/>
+  <path class="edge" d="M490,140 L550,140"/>
+  <path class="edge" d="M800,140 L860,140"/>
+  <path class="edge" d="M110,260 L110,320"/>
+  <path class="edge" d="M220,375 L280,375"/>
+  <path class="edge" d="M610,375 L670,375"/>
+
+  <!-- threshold links -->
+  <path class="dash" d="M290,470 L290,440 L350,440 L350,260"/>
+  <path class="dash" d="M290,470 L290,430 L600,430 L600,260"/>
+  <text class="t" x="360" y="440">thresholds</text>
+  <text class="t" x="610" y="440">thresholds</text>
+</svg>

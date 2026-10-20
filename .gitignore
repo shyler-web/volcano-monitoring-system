@@ -1,0 +1,7 @@
+out/*.o
+out/volcano_report
+out/volcano_report.txt
+out/batch.json
+tools/__pycache__/
+circuit/.logisim-mcp/
+*.pyc
