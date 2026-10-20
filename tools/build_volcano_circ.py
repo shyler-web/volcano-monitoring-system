@@ -286,7 +286,7 @@ def build():
     b.path([(250, gy - 40), (285, gy - 40), (285, gy - 10), (320, gy - 10)])
     b.comp("GND_CWIN_UD", "Ground", 250, gy - 70)
     b.path([(250, gy - 70), (305, gy - 70), (305, gy - 20), (330, gy - 20)])
-    b.comp("GND_CWIN_DAT", "Ground", 250, gy)
+    b.comp("GND_CWIN_DAT", "Ground", 250, gy, {"width": "4"})
     b.wire((250, gy), (320, gy))
     b.comp("GND_CWIN_CLR", "Ground", 340, gy + 60)
     b.wire((340, gy + 60), (340, gy + 20))
@@ -311,7 +311,7 @@ def build():
     b.path([(470, gy - 40), (500, gy - 40), (500, gy - 10), (520, gy - 10)])
     b.comp("GND_CABN_UD", "Ground", 470, gy - 70)
     b.path([(470, gy - 70), (510, gy - 70), (510, gy - 20), (530, gy - 20)])
-    b.comp("GND_CABN_DAT", "Ground", 470, gy)
+    b.comp("GND_CABN_DAT", "Ground", 470, gy, {"width": "4"})
     b.wire((470, gy), (520, gy))
     b.comp("T_WEND_2", "Tunnel", 450, gy + 240, {
         "width": "1", "label": "WEND", "facing": "east"})

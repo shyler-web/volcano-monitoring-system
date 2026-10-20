@@ -237,6 +237,7 @@ raised when at least two sensors reached the danger level.
 | `data/sensor_readings.csv` | 26 recorded samples of an eruption sequence |
 | `data/sensor_readings_quiet.csv` | 5 recorded samples of a quiet period |
 | `tools/gen_vectors.py` | the Python reference model and the vector generator |
+| `tools/check_circuit_widths.py` | checks that every net in the saved circuit carries one bus width |
 | `tools/build_volcano_circ.py` | generates the circuit through the Logisim MCP server |
 | `tools/cross_check.py` | compares the program's report with the reference model |
 | `tools/check_all.sh` | runs the whole verification suite |
@@ -332,7 +333,19 @@ Running the same program on `data/sensor_readings_quiet.csv` produces
 `OVERALL STATUS : NORMAL` and `EMERGENCY ALARM : not raised`, which confirms
 that the thresholds are not simply always triggered.
 
-### 6.4 Verification summary
+### 6.4 Circuit bus-width check
+
+Logisim reports a conflict between differently sized buses as
+*"Incompatible widths (n)"*. `tools/check_circuit_widths.py` reproduces that
+check directly on the saved `.circ` file, so the defect it guards against -
+tying a Counter's 4-bit `data` port to a 1-bit Ground - cannot come back:
+
+```
+volcano_monitor.circ: 173 components, 176 wires, 153 nets
+  OK: every net carries a single bus width
+```
+
+### 6.5 Verification summary
 
 ```
 ==============================================================
@@ -340,6 +353,13 @@ that the thresholds are not simply always triggered.
 ==============================================================
 Passed: 18, Failed: 0
 PASS: Logisim circuit matches every test vector
+
+==============================================================
+ 1b/3  Circuit bus-width check (Logisim "Incompatible widths")
+==============================================================
+volcano_monitor.circ: 173 components, 176 wires, 153 nets
+  OK: every net carries a single bus width
+PASS: no bus-width conflict in the saved circuit
 
 ==============================================================
  2/3  Assembly program output

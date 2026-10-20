@@ -267,6 +267,31 @@ by 10 and add the next digit:
 
 ---
 
+## 4A. One Logisim trap worth knowing
+
+Logisim's **Counter** has a `data` port that is **as wide as the counter**
+(4 bits for our counters), while `clock`, `clear`, `load`, `updown` and
+`enable` are all 1 bit.
+
+Tying `data` to an ordinary 1-bit Ground therefore makes Logisim report
+**"Incompatible widths"**, even though the value is never used - `load` is
+tied low, so the counter never loads. The circuit still behaves perfectly, but
+the file is not error-free.
+
+The fix is to make that one Ground **4 bits wide**. In the Logisim GUI: select
+the Ground, open **Properties**, set **Bit Width = 4**. A multi-bit Ground
+draws exactly the same symbol, it just carries a bus.
+
+`tools/check_circuit_widths.py` reproduces this check on the saved `.circ` file
+so the mistake cannot come back, and `make check` runs it.
+
+**A second Logisim trap:** when you open a circuit in the GUI, Logisim writes
+a hidden `.<name>.circ.autosave` file next to it and **prefers the autosave
+when loading**. If the autosave is stale, the circuit will appear to fail to
+load even though the `.circ` file is fine. Delete the autosave and reopen.
+
+---
+
 ## 5. How the two halves are checked
 
 | Check | What it proves |

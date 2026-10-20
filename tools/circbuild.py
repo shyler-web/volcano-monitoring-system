@@ -8,7 +8,7 @@ Emits an `logisim_apply_batch` payload and can self-check the result:
 """
 import json
 
-from circgeom import COMPONENTS, GATE_NAMES, gate_geometry
+from circgeom import COMPONENTS, DEFAULT_WIDTHS, GATE_NAMES, gate_geometry
 
 GREEN = "#00c000"
 YELLOW = "#e0c000"
@@ -25,6 +25,24 @@ class Builder:
         self.seen = set()
 
     # ---------- construction ----------
+    @staticmethod
+    def _port_width(name, port_name, width, attributes):
+        """Resolve a port's bus width.
+
+        The geometry table marks bus ports with 'w'; the real width comes from
+        the component's own width attribute (and for a Bit Extender from
+        in_width / out_width).
+        """
+        if width != "w":
+            return width
+        if name == "Bit Extender":
+            key = "in_width" if port_name == "in" else "out_width"
+            return int(attributes.get(key, "8"))
+        if name == "Hex Digit Display":
+            return 4
+        default = DEFAULT_WIDTHS.get(name, 1)
+        return int(attributes.get("width", default))
+
     def comp(self, cid, name, x, y, attributes=None, lib=None, body=None, ports=None):
         if cid in self.seen:
             raise ValueError(f"duplicate id {cid}")
@@ -51,7 +69,7 @@ class Builder:
             "attributes": attributes,
         })
         self.ports[cid] = {
-            pname: (x + dx, y + dy, width)
+            pname: (x + dx, y + dy, self._port_width(name, pname, width, attributes))
             for pname, (dx, dy, width) in geo["ports"].items()
         }
         if body is not None:
@@ -114,6 +132,51 @@ class Builder:
         }
 
     # ---------- self check ----------
+    def check_widths(self):
+        """Every net must carry a single bus width.
+
+        A Counter's `data` port is as wide as the counter, so tying it to a
+        1-bit Ground is a width error even though the value is never used.
+        Logisim reports that as "Incompatible widths (n)".
+        """
+        problems = []
+        parent = {}
+
+        def find(pt):
+            parent.setdefault(pt, pt)
+            while parent[pt] != pt:
+                parent[pt] = parent[parent[pt]]
+                pt = parent[pt]
+            return pt
+
+        def union(a, b):
+            ra, rb = find(a), find(b)
+            if ra != rb:
+                parent[ra] = rb
+
+        for wire in self.wires:
+            a = (wire["from_x"], wire["from_y"])
+            b = (wire["to_x"], wire["to_y"])
+            union(a, b)
+            if a[0] == b[0]:
+                for y in range(min(a[1], b[1]), max(a[1], b[1]) + 1):
+                    union(a, (a[0], y))
+            else:
+                for x in range(min(a[0], b[0]), max(a[0], b[0]) + 1):
+                    union((x, a[1]), b)
+
+        nets = {}
+        for cid, ports in self.ports.items():
+            for pname, (px, py, width) in ports.items():
+                nets.setdefault(find((px, py)), []).append((cid, pname, width))
+
+        for members in nets.values():
+            widths = {m[2] for m in members}
+            if len(widths) > 1:
+                detail = ", ".join(f"{cid}.{pname}={w}" for cid, pname, w in members)
+                problems.append(f"net width conflict ({sorted(widths)}): {detail}")
+        return problems
+
     def check(self, verbose=True):
         problems = []
 
@@ -159,6 +222,9 @@ class Builder:
                 a, b = self.bodies[ids[i]], self.bodies[ids[j]]
                 if a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]:
                     problems.append(f"body of {ids[i]} overlaps body of {ids[j]}")
+
+        # 4. every net must carry a single bus width
+        problems.extend(self.check_widths())
 
         if verbose:
             if problems:

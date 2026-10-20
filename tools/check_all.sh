@@ -27,6 +27,16 @@ fi
 
 echo
 echo "=============================================================="
+echo " 1b/3  Circuit bus-width check (Logisim "Incompatible widths")"
+echo "=============================================================="
+if python3 tools/check_circuit_widths.py; then
+  echo "PASS: no bus-width conflict in the saved circuit"
+else
+  echo "FAIL: the saved circuit has a bus-width conflict"; fails=1
+fi
+
+echo
+echo "=============================================================="
 echo " 2/3  Assembly program output"
 echo "=============================================================="
 for dataset in data/sensor_readings.csv data/sensor_readings_quiet.csv; do

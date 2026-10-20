@@ -165,3 +165,28 @@ GATE_NAMES = {
     "NOR": "NOR Gate",
     "XNOR": "XNOR Gate",
 }
+
+# Each component's own default bus width, as Logisim defines it.  These matter
+# because Logisim strips an attribute that equals the default, so a Comparator
+# written without "width" is still 8 bits wide.
+DEFAULT_WIDTHS = {
+    "Comparator": 8,
+    "Adder": 8,
+    "Counter": 8,
+    "Pin": 1,
+    "Tunnel": 1,
+    "Constant": 1,
+    "Ground": 1,
+    "Power": 1,
+    "Probe": 1,
+    "AND Gate": 1,
+    "OR Gate": 1,
+    "XOR Gate": 1,
+    "NAND Gate": 1,
+    "NOR Gate": 1,
+    "XNOR Gate": 1,
+    "NOT Gate": 1,
+    "LED": 1,
+    "Buzzer": 1,
+    "Clock": 1,
+}
