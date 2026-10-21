@@ -84,9 +84,11 @@ Design a working monitoring system that
 | Gas concentration | `GAS` | ppm | 100 | 180 |
 | Volcanic activity | `ACT` | index 0-255 | 50 | 80 |
 
+
 The emergency alarm is raised when **two or more** sensors are in the DANGER
 state at the same time, which is the assignment's "multiple sensor conditions
 indicate potentially dangerous volcanic activity".
+
 
 These twelve numbers live in exactly one place, `asm/thresholds.inc`. The
 Logisim circuit, the assembly program and the Python reference model all read
