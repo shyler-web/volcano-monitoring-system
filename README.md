@@ -79,10 +79,15 @@ Overall verdict for the recorded eruption : DANGER, emergency alarm RAISED
 
 ---
 
-## Tooling used
+## Prerequisites
 
-* **Logisim-Evolution 4.0.0** - circuit design and simulation
-* **Logisim MCP server** (`afishyke/Logisim-Evolution-MCP-Server`) - lets an AI
+Before running the project, install:
+
+- **Python 3**
+- **NASM 2.16.03** + or a compatible version
+-  **GNU ld** and the standard build tools
+- Logisim-Evolution 4.0.0 to open and simulate the circuit
+- **Logisim MCP server** (`afishyke/Logisim-Evolution-MCP-Server`) - lets an AI
   assistant build, validate and test the `.circ` file directly
-* **NASM 2.16.03** + **GNU ld** - the x86-64 assembly program
-* **Python 3** - the reference model and the test-vector generator
+
+Run **make check** to validate the project.
